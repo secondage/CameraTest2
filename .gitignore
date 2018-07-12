@@ -1,2 +1,7 @@
-
+*.apk
 Library
+*.zip
+.vs/
+HospitalClient/
+/Temp
+*.meta

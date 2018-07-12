@@ -48,6 +48,10 @@ public class AnswerPageController : MonoBehaviour
     public Text tmpText;
     public Button doneButton;
 
+    public Text waterMaskText;
+
+    public RenderTexture waterMaskTex;
+
     static public bool previewMode = false;
     [SerializeField]
     Sprite[] emojiNormalSprite = new Sprite[6];
@@ -392,6 +396,7 @@ public class AnswerPageController : MonoBehaviour
             }
         }
         LoadImg.transform.Rotate(0, 0, 5);
+        waterMaskText.text = DateTime.Now.ToString("yyyy年MM月dd日") + " " + DateTime.Now.ToShortTimeString();
     }
 
     int[] questionAccessed;
@@ -1018,9 +1023,34 @@ public class AnswerPageController : MonoBehaviour
     }
 
 
-    void AddMaskOnPhoto(Texture2D texture, string mask)
+    Texture2D AddWatermaskOnPhoto(Texture2D texture)
     {
+        int width = waterMaskTex.width;
+        int height = waterMaskTex.height;
+        Texture2D texture2D = new Texture2D(width, height, TextureFormat.ARGB32, false);
+        RenderTexture.active = waterMaskTex;
+        texture2D.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        texture2D.Apply();
 
+        int startX = texture.width - texture2D.width - 10;
+        int endX = startX + texture2D.width;
+       
+        //int startY = background.height - watermark.height - 20;
+        int startY = 1280;
+        int endY = startY + texture2D.height;
+
+        for (int x = startX; x < endX; x++)
+        {
+            for (int y = startY; y < endY; y++)
+            {
+                Color bgColor = texture.GetPixel(x, y);
+                Color wmColor = texture2D.GetPixel(x - startX, y - startY);
+                Color final_color = Color.Lerp(bgColor, wmColor, wmColor.a / 1.0f);
+                texture.SetPixel(x, y, final_color);
+            }
+        }
+        texture.Apply();
+        return texture;
     }
 
     Texture2D RotateTexture(Texture2D texture, float eulerAngles)
@@ -1101,11 +1131,14 @@ public class AnswerPageController : MonoBehaviour
                 t = RotateTexture(t, 180);
             }
         }
+        t = AddWatermaskOnPhoto(t);
 
         //距X左的距离        距Y屏上的距离  
         // t.ReadPixels(new Rect(220, 180, 200, 180), 0, 0, false);  
         //t.Apply();
         byte[] byt = t.EncodeToJPG(50);
+        //File.WriteAllBytes(Application.dataPath + "/onPcSavedScreen.png", byt);
+
         if (photoList.Count == 4)
         {
             photoList.RemoveAt(3);
