@@ -50,6 +50,7 @@ public class IntroPageController : MonoBehaviour
         builder.AppendLine("PRODUCT : " + AndroidDeviceInfo.PRODUCT);
         builder.AppendLine("MANUFACTURER : " + AndroidDeviceInfo.MANUFACTURER);
         builder.AppendLine("RESOLUTION : " + Screen.currentResolution.ToString());
+        builder.AppendLine("SDK : " + AndroidDeviceInfo.SDK_INT);
 
         verText.text = builder.ToString();
         textVerSimple.text = "版本号: " + Application.version.ToString() + " 设备号: " + AndroidDeviceInfo.GetAndroidId();
@@ -309,8 +310,10 @@ public class IntroPageController : MonoBehaviour
 
             if (Application.platform != RuntimePlatform.WindowsEditor)
             {
-                
-                installApp24(Application.persistentDataPath + "/hospital_" + version + ".apk");
+                if (AndroidDeviceInfo.SDK_INT < 24)
+                    InstallAPK(Application.persistentDataPath + "/hospital_" + version + ".apk");
+                else
+                    installApp24(Application.persistentDataPath + "/hospital_" + version + ".apk");
                 Application.Quit();
             }
         }
