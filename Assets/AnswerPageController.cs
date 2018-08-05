@@ -125,12 +125,15 @@ public class AnswerPageController : MonoBehaviour
                     q.limit = d.limit;
                     q.question = d.text;
                     q.shorttext = d.shorttxt;
-                    q.oid = d.originalid != "" ? Int32.Parse(d.originalid) : 0;
+                    if (d.originalid != null)
+                        q.oid = d.originalid != "" ? Int32.Parse(d.originalid) : 0;
+                    else
+                        q.oid = 0;
                     q.rev1 = d.rev1;
                     q.rev2 = d.rev2;
-                    if (q.rev1 != "") //判断是跳转还是互斥
+                    if (q.rev1 != null && q.rev1 != "") //判断是跳转还是互斥
                     {
-                        if (q.rev2 != "") //跳转模式
+                        if (q.rev2 != null && q.rev2 != "") //跳转模式
                         {
                             try
                             {
@@ -172,7 +175,7 @@ public class AnswerPageController : MonoBehaviour
                             }
                             catch
                             {
-                                Toast.ShowToast("解析互斥题目失败, 请检查题库");
+                                Toast.ShowToast("解析跳转题目失败, 请检查题库");
                             }
                         }
                     }
@@ -332,8 +335,7 @@ public class AnswerPageController : MonoBehaviour
         selectedDeparmentText.text = PollsConfig.selectedDepartment.name;
         selectedHospitalText.text = PollsConfig.selectedHospital.name;
 
-        questionAccessed = new int[PollsConfig.selectedDepartment.questions.Count]; //初始化题目访问map，用来记录每一题是否被跳过还是被作答
-        frameCaptured = new byte[PollsConfig.selectedDepartment.questions.Count]; //记录每一题是否被拍照
+        
         if (PollsConfig.isOfflineMode)
         {
             holdPanel.SetActive(true);
@@ -346,6 +348,8 @@ public class AnswerPageController : MonoBehaviour
         }
         else
         {
+            questionAccessed = new int[PollsConfig.selectedDepartment.questions.Count]; //初始化题目访问map，用来记录每一题是否被跳过还是被作答
+            frameCaptured = new byte[PollsConfig.selectedDepartment.questions.Count]; //记录每一题是否被拍照
             ReadyToAnswer();
         }
 

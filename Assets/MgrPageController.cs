@@ -30,6 +30,7 @@ public class MgrPageController : MonoBehaviour
     public GameObject loadingPanel;
     public GridLayoutGroup grid;
     public ScrollRect scrollRect;
+    public MessageBox messageBox;
     //public GameObject answerPage;
     //public GameObject holdPanel;
 
@@ -360,26 +361,40 @@ public class MgrPageController : MonoBehaviour
         Debug.Log("Permission granted: " + permission + ": " + (isGranted ? "Yes" : "No"));
     }
 
+    void MessageBoxCallback(int r)
+    {
+        if (r == 1)
+        {
+            // HoldPanel.gameObject.SetActive(false);
+            try
+            {
+                if (File.Exists(Application.persistentDataPath + "/answer.bin"))
+                {
+                    File.Delete(Application.persistentDataPath + "/answer.bin");
+                }
+                PollsConfig.Answers.Clear();
+#if UNITY_ANDROID
+                Toast.ShowToast("缓存清除成功");
+#endif
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
+#if UNITY_ANDROID
+                Toast.ShowToast("清除缓存失败");
+#endif
+            }
+        }
+        else
+        {
+            // HoldPanel.gameObject.SetActive(false);
+        }
+
+    }
+
     public void OnClearBtnClick()
     {
-        try
-        {
-            if (File.Exists(Application.persistentDataPath + "/answer.bin"))
-            {
-                File.Delete(Application.persistentDataPath + "/answer.bin");
-            }
-            PollsConfig.Answers.Clear();
-#if UNITY_ANDROID
-            Toast.ShowToast("缓存清除成功");
-#endif
-        }
-    catch(Exception e)
-        {
-            Debug.Log(e.Message);
-#if UNITY_ANDROID
-            Toast.ShowToast("清除缓存失败");
-#endif
-        }
+        messageBox.Show("是否确定清除缓存?", "是", "否", MessageBoxCallback);
     }
 
 
