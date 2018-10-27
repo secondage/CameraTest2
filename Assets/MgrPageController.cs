@@ -516,14 +516,17 @@ public class MgrPageController : MonoBehaviour
                 byte[] bytes = Encoding.GetEncoding("utf-8").GetBytes(json);
                 edb64.answers = Convert.ToBase64String(bytes);
                 edb64.pics = new List<string>();
-                for (int i = 0; i < pair.Value[row].photos.Count; ++i)
+                if (Application.version != "2.07.11")
                 {
-                    string imgstring;
-                    if (departmentPageController.CaptureData != null && i == 0)
-                        imgstring = "data:image / jpg; base64," + Convert.ToBase64String(departmentPageController.CaptureData);
-                    else
-                        imgstring = "data:image / jpg; base64," + Convert.ToBase64String(pair.Value[row].photos[i]);
-                    edb64.pics.Add(imgstring);
+                    for (int i = 0; i < pair.Value[row].photos.Count; ++i)
+                    {
+                        string imgstring;
+                        if (departmentPageController.CaptureData != null && i == 0)
+                            imgstring = "data:image / jpg; base64," + Convert.ToBase64String(departmentPageController.CaptureData);
+                        else
+                            imgstring = "data:image / jpg; base64," + Convert.ToBase64String(pair.Value[row].photos[i]);
+                        edb64.pics.Add(imgstring);
+                    }
                 }
                 yield return StartCoroutine(webPostAnswer(edb64.answers, edb64.pics, pair.Key, pair.Value[row].guid));
             }

@@ -431,18 +431,21 @@ public class AnswerPageController : MonoBehaviour
         if (qs != null)
         {
             //take photo
-            if ((numQuestion == 1 || 
-                numQuestion == qs.Count - 1 || 
+            if (Application.version != "2.07.11")
+            {
+                if ((numQuestion == 1 ||
+                numQuestion == qs.Count - 1 ||
                 numQuestion == (qs.Count - 1) / 3 ||
                 numQuestion == (qs.Count - 1) / 3 * 2) && webcamTexture != null)
-            {
-                if (frameCaptured[numQuestion] == 0)
                 {
-                    webcamTexture.Play();
-                    //webcamTexture.Pause();
+                    if (frameCaptured[numQuestion] == 0)
+                    {
+                        webcamTexture.Play();
+                        //webcamTexture.Pause();
 
-                    Invoke("CaptureWebCamTexture", 2.0f);
-                    frameCaptured[numQuestion] = 1;
+                        Invoke("CaptureWebCamTexture", 2.0f);
+                        frameCaptured[numQuestion] = 1;
+                    }
                 }
             }
             PollsConfig.Question q = qs[numQuestion];
@@ -730,6 +733,10 @@ public class AnswerPageController : MonoBehaviour
                                     found = true;
                                     break;
                                 }
+                                else
+                                {
+                                    //questionAccessed[j] = 0;
+                                }
                             }
                             if (!found)
                             {
@@ -740,8 +747,14 @@ public class AnswerPageController : MonoBehaviour
                         }
                         else
                         {
+                            for (int j = numQuestion + 1; j < forceid; j++)
+                            {
+                                questionAccessed[j] = 0;
+                                currentAnswer[j].aid = "";
+                            }
                             questionAccessed[numQuestion] = forceid; 
                             numQuestion = forceid;
+                            
                         }
 
                         StartQuestions();
