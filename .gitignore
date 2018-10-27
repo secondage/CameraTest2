@@ -4,4 +4,6 @@ Library
 .vs/
 HospitalClient/
 /Temp
+obj/Debug
+obj
 *.meta
